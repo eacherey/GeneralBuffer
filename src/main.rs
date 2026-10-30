@@ -11,8 +11,10 @@ use crate::handlers::AppState;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();
+    dotenvy::dotenv().ok();
 
-    let pool = db::init_pool("sqlite://buffer.db").await?;
+    let db_url = std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite://buffer.db".to_string());
+    let pool = db::init_pool(&db_url).await?;
     tracing::info!("Database connection and initialized");
 
     let state = AppState { pool };
