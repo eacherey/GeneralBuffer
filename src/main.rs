@@ -22,6 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             "/api/v1/clips",
             get(handlers::list_clips).post(handlers::create_clip),
         )
+        .route("/api/v1/clips/{id}", get(handlers::get_clip_by_id))
         .with_state(state);
 
     let addr = "0.0.0.0:3000";

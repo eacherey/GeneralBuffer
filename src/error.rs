@@ -24,7 +24,10 @@ impl IntoResponse for AppError {
             AppError::Validation(msg) => (StatusCode::BAD_REQUEST, msg),
             AppError::DataBase(err) => {
                 tracing::error!("Database error: {:?}", err);
-                (StatusCode::INTERNAL_SERVER_ERROR, "Internal Server Error".to_string())
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Internal Server Error".to_string(),
+                )
             }
         };
 

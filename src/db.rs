@@ -52,3 +52,12 @@ pub async fn get_clip(pool: &SqlitePool) -> Result<Vec<Clip>, AppError> {
 
     Ok(clips)
 }
+
+pub async fn get_clip_by_id(pool: &SqlitePool, id: Uuid) -> Result<Option<Clip>, AppError> {
+    let clip = sqlx::query_as::<_, Clip>("SELECT id, content, created_at FROM clips WHERE id = $1")
+        .bind(id)
+        .fetch_optional(pool)
+        .await?;
+
+    Ok(clip)
+}
