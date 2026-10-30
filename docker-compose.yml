@@ -1,0 +1,15 @@
+services:
+  generalbuffer:
+    build: .
+    container_name: generalbuffer
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=sqlite:///app/data/buffer.db
+      - RUST_LOG=info
+    volumes:
+      - buffer_data:/app/data
+
+volumes:
+  buffer_data:
