@@ -1,9 +1,10 @@
+mod auth;
 mod db;
 mod error;
 mod handlers;
 mod models;
 
-use axum::{Router, routing::get};
+use axum::{Router, middleware, routing::get};
 use tokio::net::TcpListener;
 
 use crate::handlers::AppState;
@@ -30,6 +31,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             "/api/v1/clips/{id}",
             get(handlers::get_clip_by_id).delete(handlers::delete_clip_by_id),
         )
+        .route_layer(middleware::from_fn_with_state(
+            state.clone(),
+            auth::auth_middleware,
+        ))
         .with_state(state);
 
     let addr = "0.0.0.0:3000";
