@@ -26,6 +26,11 @@ pub async fn init_pool(db_url: &str) -> Result<SqlitePool, sqlx::Error> {
 }
 
 pub async fn insert_clip(pool: &SqlitePool, clip: CreateClip) -> Result<Clip, AppError> {
+    if let Some(latest_clip) = get_latest_clip(pool).await?
+        && latest_clip.content == clip.content {
+        return Ok(latest_clip);
+    }
+
     let id = Uuid::new_v4();
     let created_at = Utc::now();
 
