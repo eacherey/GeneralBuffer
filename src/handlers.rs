@@ -10,6 +10,7 @@ use crate::models::{Clip, CreateClip};
 #[derive(Clone)]
 pub struct AppState {
     pub pool: SqlitePool,
+    pub api_key: String,
 }
 
 pub async fn create_clip(
