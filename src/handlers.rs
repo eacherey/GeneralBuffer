@@ -42,3 +42,12 @@ pub async fn get_clip_by_id(
         None => Err(AppError::NotFound),
     }
 }
+
+pub async fn get_latest_clip(State(state): State<AppState>) -> Result<Json<Clip>, AppError> {
+    let clip = db::get_latest_clip(&state.pool).await?;
+
+    match clip {
+        Some(clip) => Ok(Json(clip)),
+        None => Err(AppError::NotFound),
+    }
+}

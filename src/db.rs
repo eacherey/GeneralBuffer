@@ -61,3 +61,13 @@ pub async fn get_clip_by_id(pool: &SqlitePool, id: Uuid) -> Result<Option<Clip>,
 
     Ok(clip)
 }
+
+pub async fn get_latest_clip(pool: &SqlitePool) -> Result<Option<Clip>, AppError> {
+    let clip = sqlx::query_as::<_, Clip>(
+        "SELECT id, content, created_at FROM clips ORDER BY created_at DESC LIMIT 1",
+    )
+    .fetch_optional(pool)
+    .await?;
+
+    Ok(clip)
+}
