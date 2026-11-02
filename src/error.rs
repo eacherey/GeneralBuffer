@@ -9,6 +9,7 @@ pub enum AppError {
     NotFound,
     Validation(String),
     DataBase(sqlx::Error),
+    Unauthorized,
 }
 
 impl From<sqlx::Error> for AppError {
@@ -28,7 +29,8 @@ impl IntoResponse for AppError {
                     StatusCode::INTERNAL_SERVER_ERROR,
                     "Internal Server Error".to_string(),
                 )
-            }
+            },
+            AppError::Unauthorized => (StatusCode::UNAUTHORIZED, "Unauthorized".to_string()),
         };
 
         let body = Json(json!({
