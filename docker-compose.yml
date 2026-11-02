@@ -8,6 +8,7 @@ services:
     environment:
       - DATABASE_URL=sqlite:///app/data/buffer.db
       - RUST_LOG=info
+      - API_KEY=12345678
     volumes:
       - buffer_data:/app/data
 
