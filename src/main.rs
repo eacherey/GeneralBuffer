@@ -14,10 +14,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenvy::dotenv().ok();
 
     let db_url = std::env::var("DATABASE_URL").unwrap_or_else(|_| "sqlite://buffer.db".to_string());
+    let api_key = std::env::var("API_KEY")?;
     let pool = db::init_pool(&db_url).await?;
     tracing::info!("Database connection and initialized");
 
-    let state = AppState { pool };
+    let state = AppState { pool, api_key };
 
     let app = Router::new()
         .route(
