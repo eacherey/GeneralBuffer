@@ -27,7 +27,8 @@ pub async fn init_pool(db_url: &str) -> Result<SqlitePool, sqlx::Error> {
 
 pub async fn insert_clip(pool: &SqlitePool, clip: CreateClip) -> Result<Clip, AppError> {
     if let Some(latest_clip) = get_latest_clip(pool).await?
-        && latest_clip.content == clip.content {
+        && latest_clip.content == clip.content
+    {
         return Ok(latest_clip);
     }
 
@@ -71,6 +72,17 @@ pub async fn get_latest_clip(pool: &SqlitePool) -> Result<Option<Clip>, AppError
     let clip = sqlx::query_as::<_, Clip>(
         "SELECT id, content, created_at FROM clips ORDER BY created_at DESC LIMIT 1",
     )
+    .fetch_optional(pool)
+    .await?;
+
+    Ok(clip)
+}
+
+pub async fn delete_clip_by_id(pool: &SqlitePool, id: Uuid) -> Result<Option<Clip>, AppError> {
+    let clip = sqlx::query_as::<_, Clip>(
+        "DELETE FROM clips WHERE id = $1 RETURNING id, content, created_at",
+    )
+    .bind(id)
     .fetch_optional(pool)
     .await?;
 

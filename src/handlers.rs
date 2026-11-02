@@ -51,3 +51,15 @@ pub async fn get_latest_clip(State(state): State<AppState>) -> Result<Json<Clip>
         None => Err(AppError::NotFound),
     }
 }
+
+pub async fn delete_clip_by_id(
+    State(state): State<AppState>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<Clip>, AppError> {
+    let clip = db::delete_clip_by_id(&state.pool, id).await?;
+
+    match clip {
+        Some(clip) => Ok(Json(clip)),
+        None => Err(AppError::NotFound),
+    }
+}
