@@ -10,3 +10,4 @@ common = { path = "../common" }
 ureq = { version = "3.5.1", features = ["json"] }
 thiserror = "2.0.21"
 serde_json = "1.0.154"
+arboard = "3.7.0"

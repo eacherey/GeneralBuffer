@@ -1,4 +1,5 @@
 mod api;
+mod clipboard;
 mod config;
 mod error;
 

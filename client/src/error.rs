@@ -13,6 +13,9 @@ pub enum ClientError {
 
     #[error("Server error: {status}, {message}")]
     Api { status: u16, message: String },
+
+    #[error("Clipboard error: {0}")]
+    Clipboard(#[from] arboard::Error),
 }
 
 pub type ClientResult<T> = Result<T, ClientError>;
