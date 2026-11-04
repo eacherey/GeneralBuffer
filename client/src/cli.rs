@@ -14,4 +14,5 @@ pub enum Command {
     Get { id: Uuid },
     Delete { id: Uuid },
     List,
+    Hotkey
 }
