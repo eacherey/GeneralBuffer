@@ -9,7 +9,7 @@ pub struct Clip {
     pub created_at: DateTime<Utc>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize, Clone)]
 pub struct CreateClip {
     pub content: String,
 }
