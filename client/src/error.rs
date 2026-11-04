@@ -16,6 +16,9 @@ pub enum ClientError {
 
     #[error("Clipboard error: {0}")]
     Clipboard(#[from] arboard::Error),
+
+    #[error("Clipboard empty")]
+    EmptyClipboard,
 }
 
 pub type ClientResult<T> = Result<T, ClientError>;
