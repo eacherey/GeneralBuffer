@@ -1,10 +1,11 @@
 use chrono::Utc;
+use common::CreateClip;
 use sqlx::{SqlitePool, sqlite::SqliteConnectOptions};
 use std::str::FromStr;
 use uuid::Uuid;
 
 use crate::error::AppError;
-use crate::models::{Clip, CreateClip};
+use crate::models::ClipDb;
 
 pub async fn init_pool(db_url: &str) -> Result<SqlitePool, sqlx::Error> {
     let option = SqliteConnectOptions::from_str(db_url)?.create_if_missing(true);
@@ -25,7 +26,7 @@ pub async fn init_pool(db_url: &str) -> Result<SqlitePool, sqlx::Error> {
     Ok(pool)
 }
 
-pub async fn insert_clip(pool: &SqlitePool, clip: CreateClip) -> Result<Clip, AppError> {
+pub async fn insert_clip(pool: &SqlitePool, clip: CreateClip) -> Result<ClipDb, AppError> {
     if let Some(latest_clip) = get_latest_clip(pool).await?
         && latest_clip.content == clip.content
     {
@@ -42,15 +43,15 @@ pub async fn insert_clip(pool: &SqlitePool, clip: CreateClip) -> Result<Clip, Ap
         .execute(pool)
         .await?;
 
-    Ok(Clip {
+    Ok(ClipDb {
         id,
         content: clip.content,
         created_at,
     })
 }
 
-pub async fn get_clip(pool: &SqlitePool) -> Result<Vec<Clip>, AppError> {
-    let clips = sqlx::query_as::<_, Clip>(
+pub async fn get_clip(pool: &SqlitePool) -> Result<Vec<ClipDb>, AppError> {
+    let clips = sqlx::query_as::<_, ClipDb>(
         "SELECT id, content, created_at FROM clips ORDER BY created_at DESC",
     )
     .fetch_all(pool)
@@ -59,17 +60,18 @@ pub async fn get_clip(pool: &SqlitePool) -> Result<Vec<Clip>, AppError> {
     Ok(clips)
 }
 
-pub async fn get_clip_by_id(pool: &SqlitePool, id: Uuid) -> Result<Option<Clip>, AppError> {
-    let clip = sqlx::query_as::<_, Clip>("SELECT id, content, created_at FROM clips WHERE id = $1")
-        .bind(id)
-        .fetch_optional(pool)
-        .await?;
+pub async fn get_clip_by_id(pool: &SqlitePool, id: Uuid) -> Result<Option<ClipDb>, AppError> {
+    let clip =
+        sqlx::query_as::<_, ClipDb>("SELECT id, content, created_at FROM clips WHERE id = $1")
+            .bind(id)
+            .fetch_optional(pool)
+            .await?;
 
     Ok(clip)
 }
 
-pub async fn get_latest_clip(pool: &SqlitePool) -> Result<Option<Clip>, AppError> {
-    let clip = sqlx::query_as::<_, Clip>(
+pub async fn get_latest_clip(pool: &SqlitePool) -> Result<Option<ClipDb>, AppError> {
+    let clip = sqlx::query_as::<_, ClipDb>(
         "SELECT id, content, created_at FROM clips ORDER BY created_at DESC LIMIT 1",
     )
     .fetch_optional(pool)
@@ -78,8 +80,8 @@ pub async fn get_latest_clip(pool: &SqlitePool) -> Result<Option<Clip>, AppError
     Ok(clip)
 }
 
-pub async fn delete_clip_by_id(pool: &SqlitePool, id: Uuid) -> Result<Option<Clip>, AppError> {
-    let clip = sqlx::query_as::<_, Clip>(
+pub async fn delete_clip_by_id(pool: &SqlitePool, id: Uuid) -> Result<Option<ClipDb>, AppError> {
+    let clip = sqlx::query_as::<_, ClipDb>(
         "DELETE FROM clips WHERE id = $1 RETURNING id, content, created_at",
     )
     .bind(id)
