@@ -6,4 +6,7 @@ edition = "2024"
 [dependencies]
 confy = "2.0.0"
 serde = { version = "1.0.229", features = ["derive"] }
-
+common = { path = "../common" }
+ureq = { version = "3.5.1", features = ["json"] }
+thiserror = "2.0.21"
+serde_json = "1.0.154"
