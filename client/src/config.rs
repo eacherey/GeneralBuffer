@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use crate::error::ClientResult;
+
 #[derive(Default, Serialize, Deserialize)]
 pub struct Config {
     pub api_key: String,
@@ -7,9 +9,9 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn load() -> Self {
-        let config: Self = confy::load("generalbuffer", None).unwrap();
+    pub fn load() -> ClientResult<Self> {
+        let config: Self = confy::load("generalbuffer", None)?;
 
-        config
+        Ok(config)
     }
 }

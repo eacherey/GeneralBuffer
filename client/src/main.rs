@@ -3,6 +3,8 @@ mod error;
 
 use crate::config::Config;
 
-fn main() {
-    Config::load();
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let config = Config::load()?;
+
+    Ok(())
 }
