@@ -97,6 +97,11 @@ fn run_daemon(config: Config) -> Result<(), Box<dyn std::error::Error>> {
                 DispatchMessageW(&msg);
             }
         }
+
+        #[cfg(not(target_os = "windows"))]
+        loop {
+            std::thread::park();
+        }
     });
 
     println!("Daemon started. Press Ctrl+Alt+C to Push, Ctrl+Alt+V to Pull. Ctrl+C to exit.");
