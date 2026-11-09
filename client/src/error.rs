@@ -11,9 +11,6 @@ pub enum ClientError {
     #[error("Json error: {0}")]
     Serialization(#[from] serde_json::Error),
 
-    #[error("Server error: {status}, {message}")]
-    Api { status: u16, message: String },
-
     #[error("Clipboard error: {0}")]
     Clipboard(#[from] arboard::Error),
 

@@ -5,7 +5,10 @@ mod config;
 mod error;
 
 use clap::Parser;
-use global_hotkey::{hotkey::{Code, HotKey, Modifiers}, GlobalHotKeyManager, GlobalHotKeyEvent, HotKeyState};
+use global_hotkey::{
+    GlobalHotKeyEvent, GlobalHotKeyManager, HotKeyState,
+    hotkey::{Code, HotKey, Modifiers},
+};
 
 use crate::{
     cli::{Cli, Command},
@@ -33,7 +36,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             clipboard.set_clipboard(&clip.content)?;
             println!("[latest] {}", clip.content);
-
         }
         Command::Get { id } => {
             let clip = api::get_clip_by_id(&config, *id)?;
@@ -69,7 +71,7 @@ fn run_daemon(config: Config) -> Result<(), Box<dyn std::error::Error>> {
         key: Code::KeyC,
         id: 0,
     };
-    let hotkey_pull =  HotKey {
+    let hotkey_pull = HotKey {
         mods: Modifiers::CONTROL | Modifiers::ALT,
         key: Code::KeyV,
         id: 1,
@@ -77,13 +79,17 @@ fn run_daemon(config: Config) -> Result<(), Box<dyn std::error::Error>> {
 
     std::thread::spawn(move || {
         let hotkey = GlobalHotKeyManager::new().expect("Failed to create global hotkey manager");
-        hotkey.register(hotkey_push).expect("Failed to register hotkey");
-        hotkey.register(hotkey_pull).expect("Failed to register hotkey");
+        hotkey
+            .register(hotkey_push)
+            .expect("Failed to register hotkey");
+        hotkey
+            .register(hotkey_pull)
+            .expect("Failed to register hotkey");
 
         #[cfg(target_os = "windows")]
         unsafe {
             use windows_sys::Win32::UI::WindowsAndMessaging::{
-                DispatchMessageW, GetMessageW, TranslateMessage, MSG,
+                DispatchMessageW, GetMessageW, MSG, TranslateMessage,
             };
             let mut msg: MSG = std::mem::zeroed();
             while GetMessageW(&mut msg, std::ptr::null_mut(), 0, 0) > 0 {
