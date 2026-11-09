@@ -22,12 +22,12 @@ jobs:
         target:
           - os: linux
             runner: ubuntu-latest
-            binary: client
-            archive: generalbuffer-client-${{ github.ref_name }}-linux-x86_64.tar.gz
+            src_binary: target/release/client
+            asset_name: generalbuffer-client-${{ github.ref_name }}-linux-x86_64
           - os: windows
             runner: windows-latest
-            binary: client.exe
-            archive: generalbuffer-client-${{ github.ref_name }}-windows-x86_64.zip
+            src_binary: target/release/client.exe
+            asset_name: generalbuffer-client-${{ github.ref_name }}-windows-x86_64.exe
 
     steps:
       - name: Checkout code
@@ -44,22 +44,20 @@ jobs:
       - name: Build Client
         run: cargo build --release -p client
 
-      - name: Package binary (Linux)
+      - name: Prepare binary (Linux)
         if: matrix.target.os == 'linux'
-        run: |
-          tar -czvf ${{ matrix.target.archive }} -C target/release ${{ matrix.target.binary }}
+        run: cp ${{ matrix.target.src_binary }} ${{ matrix.target.asset_name }}
 
-      - name: Package binary (Windows)
+      - name: Prepare binary (Windows)
         if: matrix.target.os == 'windows'
         shell: pwsh
-        run: |
-          Compress-Archive -Path target/release/${{ matrix.target.binary }} -DestinationPath ${{ matrix.target.archive }}
+        run: Copy-Item ${{ matrix.target.src_binary }} -Destination ${{ matrix.target.asset_name }}
 
       - name: Upload binaries to Release
         uses: softprops/action-gh-release@v2
         with:
-          generate_release_notes: true
-          files: ${{ matrix.target.archive }}
+          generate_release_notes: ${{ matrix.target.os == 'linux' }}
+          files: ${{ matrix.target.asset_name }}
 
   build-server-docker:
     name: Build & Push Server Docker
