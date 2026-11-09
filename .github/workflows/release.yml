@@ -53,11 +53,11 @@ jobs:
         shell: pwsh
         run: Copy-Item ${{ matrix.target.src_binary }} -Destination ${{ matrix.target.asset_name }}
 
-      - name: Upload binaries to Release
-        uses: softprops/action-gh-release@v2
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
         with:
-          generate_release_notes: ${{ matrix.target.os == 'linux' }}
-          files: ${{ matrix.target.asset_name }}
+          name: client-${{ matrix.target.os }}
+          path: ${{ matrix.target.asset_name }}
 
   build-server-docker:
     name: Build & Push Server Docker
@@ -94,3 +94,20 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: [build-client, build-server-docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: release-assets/*
